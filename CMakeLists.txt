@@ -58,13 +58,20 @@ endif(CMAKE_BUILD_TYPE MATCHES Release)
 # add include directory 
 include_directories(include)
 
-# create our capture library
-add_library(openpnp-capture SHARED common/libmain.cpp
-                                   common/context.cpp
-                                   common/logging.cpp
-                                   common/stream.cpp)
+# create our object library
+add_library(openpnp-capture-obj OBJECT common/libmain.cpp
+                                       common/context.cpp
+                                       common/logging.cpp
+                                       common/stream.cpp)
 
-# define common properties
+# shared libraries need PIC
+set_property(TARGET openpnp-capture-obj PROPERTY POSITION_INDEPENDENT_CODE 1)
+
+# create the actual library targets
+add_library(openpnp-capture SHARED $<TARGET_OBJECTS:openpnp-capture-obj>)
+add_library(openpnp-capture-static STATIC $<TARGET_OBJECTS:openpnp-capture-obj>)
+
+# define library properties
 set_target_properties(openpnp-capture PROPERTIES
                       VERSION ${OPENPNP_CAPTURE_LIB_VERSION}
                       SOVERSION ${OPENPNP_CAPTURE_LIB_SOVERSION})
